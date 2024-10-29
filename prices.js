@@ -19,17 +19,17 @@ async function fetchPrice(url, cssSelector) {
 }
 
 const stores = {
-    'Walmart': { 
-        url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
-        selector: '.price-characteristic' 
+     'Sprouts': { 
+        url: 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004', 
+        selector: '.current-price' 
     },
     'Safeway': { 
         url: 'https://www.safeway.com/shop/product-details.111010341.html', 
         selector: '.product-price' 
     },
-    'Sprouts': { 
-        url: 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004', 
-        selector: '.current-price' 
+    'Walmart': { 
+        url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
+        selector: '.price-characteristic' 
     }
 };
 
