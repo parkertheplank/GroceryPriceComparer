@@ -4,10 +4,10 @@ async function fetchPrice(url, cssSelector) {
     try {
         const browser = await puppeteer.launch({ headless: 'new' });
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 }); // Increased timeout
 
         // Wait for the stable parent container
-        await page.waitForSelector(cssSelector, { timeout: 20000 });
+        await page.waitForSelector(cssSelector, { timeout: 60000 }); // Increased timeout
 
         const price = await page.$eval(cssSelector, el => el.textContent.trim());
         await browser.close();
@@ -19,17 +19,17 @@ async function fetchPrice(url, cssSelector) {
 }
 
 const stores = {
-    'Walmart': { 
-        url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
-        selector: 'span[itemprop="price"]'
-    },
-    'Safeway': { 
-        url: 'https://www.safeway.com/shop/product-details.111010341.html', 
-        selector: '.product-details__product-price__value'
-    },
     'Sprouts': { 
         url: 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004', 
         selector: '.current-price'
+    },
+    'Walmart': { 
+        url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
+        selector: '[itemprop="price"]' // Trying a more general attribute-based selector
+    },
+    'Safeway': { 
+        url: 'https://www.safeway.com/shop/product-details.111010341.html', 
+        selector: '.price-xl' // Simplified selector
     }
 };
 
