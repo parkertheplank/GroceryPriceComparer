@@ -15,7 +15,8 @@ async function fetchPrice(url, cssSelector) {
         await page.waitForSelector(cssSelector, { timeout: 60000 });
         
         console.log('Evaluating selector...');
-        const price = await page.$eval(cssSelector, el => el.textContent.trim());
+        const el = await page.$eval(cssSelector);
+        const price = await el.evaluate(e => e.innerHTML);
         
         await browser.close();
         console.log(`Fetched price: ${price}`);
@@ -33,11 +34,11 @@ const stores = {
     },
     'Safeway': { 
         url: 'https://www.safeway.com/shop/product-details.111010341.html', 
-        selector: '.body > main > div > div > div > div > div.row.product-details-container.desktop.mt-5 > div.col-12.col-sm-12.col-md-12.col-lg-6.col-xl-6.product-details > div > div.product-details > div.product-details__product-price > div > span:nth-child(1)' 
+        selector: '.product-details' 
     },
     'Walmart': { 
         url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
-        selector: '#maincontent > section > main > div.flex.flex-column.h-100 > div:nth-child(2) > div > div.w_aoqv.w_wRee.w_b_WN > div > div:nth-child(1) > div > div > span.b.lh-copy.dark-gray.f1.mr2 > span.inline-flex.flex-column > span' 
+        selector: 'span[itemprop="price"]' 
     }
 };
 
