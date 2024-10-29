@@ -1,32 +1,5 @@
 const puppeteer = require('puppeteer');
 
-async function fetchPrice(url, cssSelector) {
-    console.log(`Fetching price from ${url} with selector ${cssSelector}`);
-    try {
-        const browser = await puppeteer.launch({ headless: 'new' });
-        const page = await browser.newPage();
-        
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-        console.log('Navigating to page...');
-        
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-        
-        console.log('Waiting for selector...');
-        await page.waitForSelector(cssSelector, { timeout: 60000 });
-        
-        console.log('Evaluating selector...');
-        const el = await page.$eval(cssSelector);
-        const price = await el.evaluate(e => e.innerHTML);
-        
-        await browser.close();
-        console.log(`Fetched price: ${price}`);
-        return price;
-    } catch (error) {
-        console.error(`Error fetching price from ${url}:`, error);
-        return null;
-    }
-}
-
 const stores = {
     'Sprouts': { 
         url: 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004', 
@@ -34,11 +7,11 @@ const stores = {
     },
     'Safeway': { 
         url: 'https://www.safeway.com/shop/product-details.111010341.html', 
-        selector: '.product-details' 
+        selector: 'body' 
     },
     'Walmart': { 
         url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
-        selector: 'span[itemprop="price"]' 
+        selector: 'body' 
     }
 };
 
@@ -49,9 +22,16 @@ const stores = {
             console.log(`Processing ${store}...`);
             const page = await browser.newPage();
             await page.goto(info.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+            console.log('Waiting for selector...');
             await page.waitForSelector(info.selector, { timeout: 60000 });
-            const price = await page.$eval(info.selector, el => el.textContent.trim());
-            console.log(`${store}: ${price}`);
+
+            console.log('Evaluating selector...');
+            const el = await page.$eval(info.selector);
+            const price = await el.evaluate(e => e.innerHTML);
+            
+            console.log(`${store});
+            console.log('${price}`);
             await page.close();
         }
     } catch (error) {
