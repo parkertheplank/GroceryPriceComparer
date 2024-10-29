@@ -5,14 +5,18 @@ async function fetchPrice(url, cssSelector) {
     try {
         const browser = await puppeteer.launch({ headless: 'new' });
         const page = await browser.newPage();
+        
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
         console.log('Navigating to page...');
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-
+        
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        
         console.log('Waiting for selector...');
         await page.waitForSelector(cssSelector, { timeout: 60000 });
-
+        
         console.log('Evaluating selector...');
         const price = await page.$eval(cssSelector, el => el.textContent.trim());
+        
         await browser.close();
         console.log(`Fetched price: ${price}`);
         return price;
@@ -25,15 +29,11 @@ async function fetchPrice(url, cssSelector) {
 const stores = {
     'Sprouts': { 
         url: 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004', 
-        selector: '.current-price' 
-    },
-    'Safeway': { 
-        url: 'https://www.safeway.com/shop/product-details.111010341.html', 
-        selector: '.product-price' 
+        selector: '#regular_price'
     },
     'Walmart': { 
         url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
-        selector: '.price-characteristic' 
+        selector: '//*[@id="maincontent"]/section/main/div[2]/div[2]/div/div[3]/div/div[1]/div/div/span[1]/span[2]/span' 
     }
 };
 
@@ -43,7 +43,7 @@ const stores = {
         for (const [store, info] of Object.entries(stores)) {
             console.log(`Processing ${store}...`);
             const page = await browser.newPage();
-            await page.goto(info.url, { waitUntil: 'networkidle2', timeout: 60000 });
+            await page.goto(info.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
             await page.waitForSelector(info.selector, { timeout: 60000 });
             const price = await page.$eval(info.selector, el => el.textContent.trim());
             console.log(`${store}: ${price}`);
