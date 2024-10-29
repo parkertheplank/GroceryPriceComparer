@@ -1,12 +1,13 @@
 {
-  "name": "granola-scraper",
+  "name": "price-scraper",
   "version": "1.0.0",
   "scripts": {
     "start": "node prices.js"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "cheerio": "^1.0.0-rc.10",
-    "puppeteer": "^19.1.0"
+    "puppeteer": "^10.0.0",
+    "puppeteer-extra": "^3.1.18",
+    "puppeteer-extra-plugin-stealth": "^2.7.7",
+    "2captcha": "^1.0.0" 
   }
 }
