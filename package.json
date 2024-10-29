@@ -1,0 +1,11 @@
+{
+  "name": "granola-scraper",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node scraper.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.10"
+  }
+}
