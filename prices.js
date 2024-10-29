@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const captchaSolver = require('2captcha'); // Replace with the service you choose
 
 puppeteer.use(StealthPlugin());
 
@@ -11,16 +10,11 @@ async function fetchPrice(url, cssSelector) {
 
         // Set user agent and proxies
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
-        await page.authenticate({ username: 'your-proxy-username', password: 'your-proxy-password' }); // If needed
+        // Uncomment and set these lines if you're using proxies
+        // await page.authenticate({ username: 'your-proxy-username', password: 'your-proxy-password' });
 
         console.log(`Navigating to ${url}...`);
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-
-        console.log('Solving CAPTCHA if present...');
-        const captchaResponse = await captchaSolver.solveCaptcha(page); // Integrate the CAPTCHA-solving service
-        if (captchaResponse) {
-            console.log('CAPTCHA solved, continuing...');
-        }
 
         console.log('Waiting for selector...');
         await page.waitForSelector(cssSelector, { timeout: 60000 });
