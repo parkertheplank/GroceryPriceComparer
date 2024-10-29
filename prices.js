@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 async function fetchPrice(url, cssSelector) {
     try {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({headless: 'new' });
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'load', timeout: 0 });
 
