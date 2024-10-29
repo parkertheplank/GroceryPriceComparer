@@ -1,35 +1,17 @@
 const puppeteer = require('puppeteer');
 
-async function fetchPrice(url, cssSelector) {
-    try {
-        const browser = await puppeteer.launch({ headless: 'new' });
-        const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
-
-        // Wait for a more stable parent container that ensures the price will eventually load
-        await page.waitForSelector(cssSelector, { timeout: 20000 });
-
-        const price = await page.$eval(cssSelector, el => el.textContent.trim());
-        await browser.close();
-        return price;
-    } catch (error) {
-        console.error(`Error fetching price from ${url}:`, error);
-        return null;
-    }
-}
-
 async function searchForPrice(url) {
     try {
         const browser = await puppeteer.launch({ headless: 'new' });
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 0 });
 
-        // Look for elements containing '$'
+        // Look for elements containing '$' followed by numbers
         await page.waitForTimeout(5000); // Wait for the content to load
-        const price = await page.$eval("body", body => {
-            const elements = body.querySelectorAll('*');
+        const price = await page.evaluate(() => {
+            const elements = document.querySelectorAll('*');
             for (let element of elements) {
-                if (element.textContent.includes('$')) {
+                if (element.textContent && /\$\d+/.test(element.textContent)) {
                     return element.textContent.trim();
                 }
             }
@@ -51,11 +33,11 @@ const stores = {
 
 (async () => {
     for (const [store, url] of Object.entries(stores)) {
-        let price = await fetchPrice(url, '.price-characteristic'); // Attempt with specific selector
-        if (!price) {
-            console.error(`Specific selector failed for ${store}, trying general search.`);
-            price = await searchForPrice(url); // Fallback to general search
+        try {
+            const price = await searchForPrice(url);
+            console.log(`${store}: ${price}`);
+        } catch (error) {
+            console.error(`${store} failed completely:`, error);
         }
-        console.log(`${store}: ${price}`);
     }
 })();
