@@ -1,18 +1,13 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 
 async function fetchPrice(url, cssSelector) {
     try {
-        const { data } = await axios.get(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Connection': 'keep-alive'
-            }
-        });
-        const $ = cheerio.load(data);
-        const price = $(cssSelector).text();
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'load', timeout: 0 });
+
+        const price = await page.$eval(cssSelector, el => el.textContent);
+        await browser.close();
         return price.trim();
     } catch (error) {
         console.error(`Error fetching price from ${url}:`, error);
@@ -32,4 +27,3 @@ const stores = {
         console.log(`${store}: ${price}`);
     }
 })();
-
