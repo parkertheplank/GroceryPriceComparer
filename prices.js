@@ -1,43 +1,36 @@
 const puppeteer = require('puppeteer');
 
-const stores = {
-    'Sprouts': { 
-        url: 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004', 
-        selector: '#regular_price'
-    },
-    'Safeway': { 
-        url: 'https://www.safeway.com/shop/product-details.111010341.html', 
-        selector: 'body' 
-    },
-    'Walmart': { 
-        url: 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366', 
-        selector: 'body' 
+async function printHTML(url) {
+    try {
+        const browser = await puppeteer.launch({ headless: 'new' });
+        const page = await browser.newPage();
+        console.log(`Navigating to ${url}...`);
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        
+        // Grab the HTML body
+        const html = await page.content();
+        await browser.close();
+        return html;
+    } catch (error) {
+        console.error(`Error fetching HTML from ${url}:`, error);
+        return null;
     }
+}
+
+const stores = {
+    'Sprouts': 'https://shop.sprouts.com/landing?product_id=25446&region_id=2887106004',
+    'Safeway': 'https://www.safeway.com/shop/product-details.111010341.html',
+    'Walmart': 'https://www.walmart.com/ip/Bear-Naked-Vanilla-Almond-Crisp-Granola-Cereal-Mega-Pack-16-5-oz-Bag/961171366'
 };
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: 'new' });
-    try {
-        for (const [store, info] of Object.entries(stores)) {
-            console.log(`Processing ${store}...`);
-            const page = await browser.newPage();
-            await page.goto(info.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-
-            console.log('Waiting for selector...');
-            await page.waitForSelector(info.selector, { timeout: 60000 });
-
-            console.log('Evaluating selector...');
-            const el = await page.$eval(info.selector);
-            const price = await el.evaluate(e => e.innerHTML);
-            
-            console.log(`${store});
-            console.log('${price}`);
-            await page.close();
+    for (const [store, url] of Object.entries(stores)) {
+        try {
+            console.log(`Fetching HTML for ${store}...`);
+            const html = await printHTML(url);
+            console.log(`${store} HTML:`, html);
+        } catch (error) {
+            console.error(`${store} failed completely:`, error);
         }
-    } catch (error) {
-        console.error('General error:', error);
-    } finally {
-        await browser.close();
-        console.log('Browser closed.');
     }
 })();
